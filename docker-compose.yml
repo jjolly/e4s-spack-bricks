@@ -1,0 +1,12 @@
+version: '3'
+services:
+    cpu:
+        build:
+            context:    .
+            dockerfile: ./cpu/Dockerfile
+        image: 'e4s-spack-bricks:cpu'
+    cuda:
+        build:
+            context:    .
+            dockerfile: ./cuda/Dockerfile
+        image: 'e4s-spack-bricks:cuda'
