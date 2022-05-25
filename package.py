@@ -1,6 +1,6 @@
 from spack import *
 
-class Bricks(CMakePackage):
+class Bricks(CMakePackage, CudaPackage):
 
     """Bricks is a data layout and code generation framework, enabling performance-portable stencil computations across a multitude of architectures."""
 
@@ -15,16 +15,13 @@ class Bricks(CMakePackage):
 
     version('r0.1', branch='r0.1')
 
-    variant('cuda', default=False, description='Build bricks with CUDA enabled')
-
     # Building a variant of cmake without openssl is to match how the
     # ECP E4S project builds cmake in their e4s-base-cuda Docker image
-    depends_on('cmake~openssl', type='build')
+    depends_on('cmake', type='build')
     depends_on('autoconf', type='build')
     depends_on('automake', type='build')
     depends_on('libtool', type='build')
     depends_on('opencl-clhpp', when='+cuda')
-    depends_on('cuda', when='+cuda')
     depends_on('mpi')
 
     def cmake_args(self):
