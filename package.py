@@ -8,6 +8,8 @@ class Bricks(CMakePackage):
     homepage = "https://bricks.run/"
     git = 'https://github.com/CtopCsUtahEdu/bricklib.git'
 
+    test_requires_compiler = True
+
     # List of GitHub accounts to notify when the package is updated.
     maintainers = ['ztuowen', 'drhansj']
 
@@ -42,6 +44,33 @@ class Bricks(CMakePackage):
             # architectures can use the libraries and tests in this
             # project by forceing the AVX512F flag in gcc.
             if name == 'cxxflags' and self.spec.target == 'x86_64':
-                flags.append('-mavx512f')
+                flags.append('-mavx2')
             return (None, flags, None)
         return(flags, None, None)
+
+    @run_after('install')
+    def copy_test_sources(self):
+        srcs = [ join_path('examples', 'external', 'CMakeLists.txt'),
+                 join_path('examples', 'external', 'main.cpp'),
+                 join_path('examples', 'external', '7pt.py') ]
+        self.cache_extra_test_sources(srcs)
+
+    def test(self):
+        """Test bricklib package"""
+        # Test prebuilt binary
+        source_dir = join_path(self.test_suite.current_test_cache_dir, 'examples', 'external')
+
+        self.run_test(exe='cmake',
+                      options=['.'],
+                      purpose='Configure bricklib example',
+                      work_dir=source_dir)
+
+        self.run_test(exe='cmake',
+                      options=['--build', '.'],
+                      purpose='Build bricklib example',
+                      work_dir=source_dir)
+
+        self.run_test(exe=join_path(source_dir, 'example'),
+                      options=[],
+                      purpose='Execute bricklib example',
+                      work_dir=source_dir)
